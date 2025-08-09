@@ -53,7 +53,7 @@ coverage.xml
 cover/
 
 #pdf
-*.pdf
+TAM_Assessment_.pdf
 # Translations
 *.mo
 *.pot
