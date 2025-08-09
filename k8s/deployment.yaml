@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-saas-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: flask-saas-app
+  template:
+    metadata:
+      labels:
+        app: flask-saas-app
+    spec:
+      containers:
+      - name: flask-saas-app
+        image: registry.digitalocean.com/dodemo/flask-saas-app:latest
+        ports:
+        - containerPort: 8080
