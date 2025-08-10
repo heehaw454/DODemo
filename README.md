@@ -68,7 +68,38 @@ kubectl apply -f k8s/service.yaml
 
 ---
 
-### 4. Verify Deployment
+### 4. Set Up Horizontal Pod Autoscaler (HPA)
+
+**a. Ensure Metrics Server is Installed**
+
+The HPA requires the metrics server to collect CPU/memory usage.  
+Install it (if not already present):
+
+```bash
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+```
+
+**b. Apply the HPA Manifest**
+
+Apply the provided HPA configuration:
+
+```bash
+kubectl apply -f k8s/hpa.yml
+```
+
+This will autoscale your deployment between 3 and 5 replicas based on 70% average CPU utilization.
+
+**c. Verify HPA Status**
+
+Check the HPA status:
+
+```bash
+kubectl get hpa
+```
+
+---
+
+### 5. Verify Deployment
 
 Check that your pods and service are running:
 
@@ -88,7 +119,7 @@ kubectl get service flask-saas-app-service
 
 ---
 
-### 5. Access the Application
+### 6. Access the Application
 
 Once the service is provisioned, retrieve the external IP or DNS name:
 
@@ -114,7 +145,8 @@ DODemo/
 ├── Dockerfile
 ├── k8s/
 │   ├── deployment.yaml
-│   └── service.yaml
+│   ├── service.yaml
+│   └── hpa.yml
 ```
 
 ---
@@ -124,4 +156,4 @@ DODemo/
 - The deployment is set to 3 replicas for high availability.
 - The service uses a LoadBalancer to expose the app externally on port 80, forwarding to port 8080 in the container.
 - The deployment is configured for autoscaling, so the number of replicas may increase or decrease based on resource usage and cluster configuration.
-- Make sure your image is updated in the registry before deploying
+- Make sure your image is updated in the
