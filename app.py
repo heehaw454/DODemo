@@ -13,8 +13,7 @@
 
 # 3. Save the following code into a file (e.g., app.py):
 
-
-from flask import Flask, render_template_string, url_for, redirect
+from flask import Flask, render_template_string, request
 
 app = Flask(__name__)
 
@@ -54,30 +53,62 @@ base_css = """
     button:hover {
         background-color: #45a049;
     }
+    .product-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+        align-items: center;
+    }
+    .product-item {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 1em;
+        width: 80%;
+        background: #fafafa;
+        box-shadow: 0px 0px 5px rgba(0,0,0,0.05);
+    }
 </style>
 """
+
+# Product data
+products = [
+    {"id": 1, "name": "Awesome SaaS Subscription", "desc": "Only $9.99/month. Cancel anytime.", "price": "$9.99/month"},
+    {"id": 2, "name": "Pro Analytics Add-on", "desc": "Advanced analytics for your business.", "price": "$4.99/month"},
+    {"id": 3, "name": "Priority Support", "desc": "24/7 support for your team.", "price": "$2.99/month"},
+]
 
 # Homepage template
 home_template = base_css + """
 <header>My Simple SaaS Store</header>
 <div class="container">
     <h2>Welcome to the Store</h2>
-    <p>Click below to view our featured product.</p>
-    <form action="/product">
-        <button type="submit">View Product</button>
+    <p>Click below to view our products.</p>
+    <form action="/products">
+        <button type="submit">View Products</button>
     </form>
 </div>
 """
 
-# Product page template
-product_template = base_css + """
-<header>Product Page</header>
+# Products page template
+products_template = base_css + """
+<header>Products</header>
 <div class="container">
-    <h2>Awesome SaaS Subscription</h2>
-    <p>Only $9.99/month. Cancel anytime.</p>
-    <form action="/checkout">
-        <button type="submit">Buy Now</button>
-    </form>
+    <h2>Choose a Product</h2>
+    <div class="product-list">
+        {% for product in products %}
+        <div class="product-item">
+            <h3>{{ product.name }}</h3>
+            <p>{{ product.desc }}</p>
+            <strong>{{ product.price }}</strong>
+            <form action="/checkout" method="get">
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+                <button type="submit">Buy Now</button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+    <br>
+    <a href="/">Return Home</a>
 </div>
 """
 
@@ -86,7 +117,7 @@ checkout_template = base_css + """
 <header>Checkout</header>
 <div class="container">
     <h2>Thank You!</h2>
-    <p>Your purchase has been confirmed.</p>
+    <p>Your purchase of <strong>{{ product_name }}</strong> has been confirmed.</p>
     <a href="/">Return Home</a>
 </div>
 """
@@ -95,12 +126,14 @@ checkout_template = base_css + """
 def home():
     return render_template_string(home_template)
 
-@app.route("/product")
-def product():
-    return render_template_string(product_template)
+@app.route("/products")
+def products_page():
+    return render_template_string(products_template, products=products)
 
 @app.route("/checkout")
 def checkout():
-    return render_template_string(checkout_template)
+    product_id = request.args.get("product_id", type=int)
+    product_name = next((p["name"] for p in products if p["id"] == product_id), "Unknown Product")
+    return render_template_string(checkout_template, product_name=product_name)
 
 app.run(host="0.0.0.0",port=8080)

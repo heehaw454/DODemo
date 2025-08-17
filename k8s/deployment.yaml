@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: flask-saas-app
-        image: registry.digitalocean.com/dodemo/flask-saas-app:latest
+        image: registry.digitalocean.com/dodemo/flask-saas-app:v2
         ports:
         - containerPort: 8080
         resources:
